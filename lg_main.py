@@ -48,11 +48,9 @@ def log_reg_GD(dataset='iris', lr_rates=[0.1], method='SGD', total_iter=2000):
     x_train = np.vstack([x_train, x_valid])
     y_train = np.vstack([y_train, y_valid])
 
-    # Create X matrix (Used for all lr_rates)
     X = np.ones((len(x_train), len(x_train[0]) + 1))
     X[:, 1:] = x_train
 
-    # Create X_test matrix for test predictions
     X_test = np.ones((len(x_test), len(x_test[0]) + 1))
     X_test[:, 1:] = x_test
 
@@ -63,34 +61,25 @@ def log_reg_GD(dataset='iris', lr_rates=[0.1], method='SGD', total_iter=2000):
 
     for rate in lr_rates:
 
-        # Initialize minimizer
         w = np.zeros(np.shape(X[0, :]))
-
         neg_log[rate] = []
-
         bar = tqdm.tqdm(total=total_iter, desc='Iter', position=0)
         for iteration in range(total_iter):
             bar.update(1)
 
-            # LM Estimates (on training set)
             estimates = X @ w
             estimates = estimates.reshape(np.shape(y_train))
 
             if method == 'SGD':
-                # Compute Mini-Batch (1) Gradient
                 i = random.randint(0, len(y_train)-1)
                 grad_L = (y_train[i] - _sigmoid(estimates[i])) * X[i, :]
 
             elif method == 'GD':
-                # Compute Full-Batch Gradient
                 grad_L = np.zeros(np.shape(w))
                 for i in range(len(y_train)):
                     grad_L += (y_train[i] - _sigmoid(estimates[i])) * X[i, :]
 
-            # Update weights
             w = w + (rate*grad_L)
-
-            # Calculate Full-Batch Log-Likelihood
             L = _log_likelihood(estimates, y_train)
             neg_log[rate].append(-L)
 
@@ -145,7 +134,6 @@ def sgd_mnist(dataset='mnist_small', M=100, batch_size=250, total_iter=5000, lr_
         neg_ll_train[rate] = []
         neg_ll_valid[rate] = []
 
-        # holding the minimum validation log-likelihood
         min_ll_valid = np.inf
         min_ll_valid_it = 0
 
@@ -165,7 +153,6 @@ def sgd_mnist(dataset='mnist_small', M=100, batch_size=250, total_iter=5000, lr_
 
             neg_ll_train[rate].append(nll/batch_size)
 
-            # update weights
             W1 = _update_weights(W1, W1_grad, rate, 1)
             W2 = _update_weights(W2, W2_grad, rate, 1)
             W3 = _update_weights(W3, W3_grad, rate, 1)
@@ -176,7 +163,6 @@ def sgd_mnist(dataset='mnist_small', M=100, batch_size=250, total_iter=5000, lr_
         val_acc[rate] = _compute_acc(W1, W2, W3, b1, b2, b3, x_valid, y_valid)
         test_acc[rate] = _compute_acc(W1, W2, W3, b1, b2, b3, x_test, y_test)
 
-        #compute digits that are not confidently predicted
         digit_vis[rate] = []
         for i in x_test:
             Fhat = np.exp(a3_mod.forward_pass(W1, W2, W3, b1, b2, b3, i))
