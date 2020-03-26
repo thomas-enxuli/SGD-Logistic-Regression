@@ -19,7 +19,7 @@ $ pip install -r requirements.txt
 ### Starting the Script
 To run the script, go to the root directory and run `python` in cmd/terminal and type the following in the python console:
 ```
->>> from knn_main import *
+>>> from lg_main import *
 ```
 *Note: ensure that python refers to Python 3.6.x*
 
